@@ -12,5 +12,10 @@ Provides a component-based GUI system for inventories
 ## Vanillify
 Provides NMS hooks and various utilities to make vanilla things easier to do in bukkit
 
+#### NMS Hooks
+- Actionbar
+
 ## AnvilGUI
+Easily use anvil guis to get a user's input.
+
 (May be outdated, see https://github.com/WesJD/AnvilGUI for most recent versions)
