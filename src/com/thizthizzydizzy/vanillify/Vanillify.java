@@ -1,16 +1,21 @@
 package com.thizthizzydizzy.vanillify;
 import com.thizthizzydizzy.vanillify.version.VersionMatcher;
 import com.thizthizzydizzy.vanillify.version.VersionWrapper;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.CommandMinecart;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 public class Vanillify{
     private static final VersionWrapper WRAPPER = new VersionMatcher().match();
@@ -50,6 +55,19 @@ public class Vanillify{
         }
         throw new IllegalArgumentException("Translated the UUID wrong! uh oh!");
     }
+    public static <T extends Entity> T summonItem(Location location, Material material, int count, String tag){
+        World world = location.getWorld();
+        UUID uid = UUID.randomUUID();
+        int a = (int)(uid.getMostSignificantBits() >> 32);
+        int b = (int)uid.getMostSignificantBits();
+        int c = (int)(uid.getLeastSignificantBits() >> 32);
+        int d = (int)uid.getLeastSignificantBits();
+        runCommand(world, "summon item "+location.getX()+" "+location.getY()+" "+location.getZ()+" {UUID:[I;"+a+","+b+","+c+","+d+"],Item:{id:\""+material.getKey().getNamespace()+":"+material.getKey().getKey()+"\",Count:"+count+"b"+(tag==null?"":(",tag:"+tag))+"}}");
+        for(Entity e : world.getEntitiesByClass(EntityType.DROPPED_ITEM.getEntityClass())){
+            if(e.getUniqueId().equals(uid))return (T)e;
+        }
+        throw new IllegalArgumentException("Translated the UUID wrong! uh oh!");
+    }
     public static void runCommand(World world, String command){
         boolean val = false;
         if(hideOutput){
@@ -61,5 +79,39 @@ public class Vanillify{
         Bukkit.dispatchCommand(cart, command);
         cart.remove();
         if(hideOutput)world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, val);
+    }
+    public static Item dropItem(Location location, ItemStack stack){
+        World world = location.getWorld();
+        UUID uid = UUID.randomUUID();
+        int a = (int)(uid.getMostSignificantBits() >> 32);
+        int b = (int)uid.getMostSignificantBits();
+        int c = (int)(uid.getLeastSignificantBits() >> 32);
+        int d = (int)uid.getLeastSignificantBits();
+        runCommand(world, "summon "+EntityType.DROPPED_ITEM.getKey().toString()+" "+location.getX()+" "+location.getY()+" "+location.getZ()+" {Item:{id:\"minecraft:stone\",Count:1b},PickupDelay:40s,UUID:[I;"+a+","+b+","+c+","+d+"]}");
+        Item item = null;
+        for(Entity e : world.getEntitiesByClass(Item.class)){
+            if(e.getUniqueId().equals(uid)){
+                item = (Item)e;
+                break;
+            }
+        }
+        if(item==null)throw new IllegalArgumentException("Translated the UUID wrong! uh oh!");
+        item.setItemStack(stack);
+        return item;
+    }
+    public static ArrayList<Material> getBlocks(String name){
+        ArrayList<Material> blocks = new ArrayList<>();
+        if(name.startsWith("#")){
+            Iterable<Tag<Material>> tags = Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class);
+            for(Tag<Material> tag : tags){
+                if(tag.getKey().toString().equals(name.substring(1))){
+                    blocks.addAll(tag.getValues());
+                    break;
+                }
+            }
+        }else{
+            blocks.add(Material.matchMaterial(name));
+        }
+        return blocks;
     }
 }
