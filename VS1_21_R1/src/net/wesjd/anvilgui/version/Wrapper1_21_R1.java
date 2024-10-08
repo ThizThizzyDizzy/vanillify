@@ -39,7 +39,7 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
     @Override
     public void handleInventoryCloseEvent(Player player) {
         CraftEventFactory.handleInventoryCloseEvent(toNMS(player));
-        toNMS(player).s(); // s -> doCloseContainer
+        toNMS(player).t(); // t -> doCloseContainer
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
 
     @Override
     public void setActiveContainerDefault(Player player) {
-        toNMS(player).cd = toNMS(player).cc; // cb -> containerMenu, ca -> inventoryMenu
+        toNMS(player).cd = toNMS(player).cc; // cd -> containerMenu, cc -> inventoryMenu
     }
 
     @Override
@@ -140,7 +140,10 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
 
         @Override
         public Inventory getBukkitInventory() {
-            return getBukkitView().getTopInventory();
+            // NOTE: we need to call Container#getBukkitView() instead of ContainerAnvil#GetBukkitView()
+            // because ContainerAnvil#getBukkitView() had an ABI breakage in the middle of the Minecraft 1.21
+            // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/324
+            return ((Container) this).getBukkitView().getTopInventory();
         }
     }
 }
