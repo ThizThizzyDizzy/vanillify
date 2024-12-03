@@ -5,6 +5,7 @@ import net.minecraft.core.IRegistryCustom;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
+import net.minecraft.network.protocol.game.PacketPlayOutExperience;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
@@ -50,6 +51,11 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
     @Override
     public void sendPacketCloseWindow(Player player, int containerId) {
         toNMS(player).c.b(new PacketPlayOutCloseWindow(containerId));
+    }
+
+    @Override
+    public void sendPacketExperienceChange(Player player, int experienceLevel) {
+        toNMS(player).c.b(new PacketPlayOutExperience(0f, 0, experienceLevel));
     }
 
     @Override
@@ -140,9 +146,9 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
 
         @Override
         public Inventory getBukkitInventory() {
-            // NOTE: we need to call Container#getBukkitView() instead of ContainerAnvil#GetBukkitView()
+            // NOTE: We need to call Container#getBukkitView() instead of ContainerAnvil#getBukkitView()
             // because ContainerAnvil#getBukkitView() had an ABI breakage in the middle of the Minecraft 1.21
-            // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/324
+            // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/342
             return ((Container) this).getBukkitView().getTopInventory();
         }
     }

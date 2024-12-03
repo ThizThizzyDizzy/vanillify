@@ -1,6 +1,8 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.IRegistryCustom;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
 import net.minecraft.network.protocol.game.PacketPlayOutExperience;
@@ -9,13 +11,13 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.*;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_21_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R2.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public final class Wrapper1_19_R2 implements VersionWrapper {
+public final class Wrapper1_21_R2 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
     }
@@ -38,32 +40,32 @@ public final class Wrapper1_19_R2 implements VersionWrapper {
     @Override
     public void handleInventoryCloseEvent(Player player) {
         CraftEventFactory.handleInventoryCloseEvent(toNMS(player));
-        toNMS(player).s(); // s -> doCloseContainer
+        toNMS(player).q(); // q -> doCloseContainer
     }
 
     @Override
     public void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle) {
-        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent) inventoryTitle));
+        toNMS(player).f.b(new PacketPlayOutOpenWindow(containerId, Containers.i, (IChatBaseComponent) inventoryTitle));
     }
 
     @Override
     public void sendPacketCloseWindow(Player player, int containerId) {
-        toNMS(player).b.a(new PacketPlayOutCloseWindow(containerId));
+        toNMS(player).f.b(new PacketPlayOutCloseWindow(containerId));
     }
 
     @Override
     public void sendPacketExperienceChange(Player player, int experienceLevel) {
-        toNMS(player).b.a(new PacketPlayOutExperience(0f, 0, experienceLevel));
+        toNMS(player).f.b(new PacketPlayOutExperience(0f, 0, experienceLevel));
     }
 
     @Override
     public void setActiveContainerDefault(Player player) {
-        toNMS(player).bU = toNMS(player).bT;
+        toNMS(player).cd = toNMS(player).cc; // cd -> containerMenu, cc -> inventoryMenu
     }
 
     @Override
     public void setActiveContainer(Player player, AnvilContainerWrapper container) {
-        toNMS(player).bU = (Container) container;
+        toNMS(player).cd = (Container) container;
     }
 
     @Override
@@ -81,19 +83,19 @@ public final class Wrapper1_19_R2 implements VersionWrapper {
 
     @Override
     public Object literalChatComponent(String content) {
-        return IChatBaseComponent.b(content);
+        return IChatBaseComponent.b(content); // IChatBaseComponent.b -> Component.literal
     }
 
     @Override
     public Object jsonChatComponent(String json) {
-        return IChatBaseComponent.ChatSerializer.a(json);
+        return IChatBaseComponent.ChatSerializer.a(json, IRegistryCustom.b);
     }
 
     private static class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
         public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
-                    ((CraftPlayer) player).getHandle().fE(),
+                    ((CraftPlayer) player).getHandle().gi(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
@@ -102,45 +104,52 @@ public final class Wrapper1_19_R2 implements VersionWrapper {
         @Override
         public void l() {
             // If the output is empty copy the left input into the output
-            Slot output = this.b(2);
-            if (!output.f()) {
-                output.e(this.b(0).e().o());
+            Slot output = this.b(2); // b -> getSlot
+            if (!output.h()) { // h -> hasItem
+                output.f(this.b(0).g().v()); // f -> set, g -> getItem, v -> copy
             }
 
-            this.w.a(0);
+            this.y.a(0); // y -> cost, a -> set
 
             // Sync to the client
-            this.b();
-            this.d();
+            this.b(); // b -> sendAllDataToRemote
+            this.d(); // d -> broadcastChanges
         }
 
         @Override
-        public void b(EntityHuman player) {}
+        public void a(EntityHuman player) {}
 
         @Override
         protected void a(EntityHuman player, IInventory container) {}
 
         public int getContainerId() {
-            return this.j;
+            return this.l;
         }
 
         @Override
         public String getRenameText() {
-            return this.v;
+            return this.x;
         }
 
         @Override
         public void setRenameText(String text) {
             // If an item is present in the left input slot change its hover name to the literal text.
             Slot inputLeft = b(0);
-            if (inputLeft.f()) {
-                inputLeft.e().a(IChatBaseComponent.b(text));
+            if (inputLeft.h()) {
+                inputLeft
+                        .g()
+                        .b(
+                                DataComponents.g,
+                                IChatBaseComponent.b(text)); // DataComponents.g -> DataComponents.CUSTOM_NAME
             }
         }
 
         @Override
         public Inventory getBukkitInventory() {
-            return getBukkitView().getTopInventory();
+            // NOTE: We need to call Container#getBukkitView() instead of ContainerAnvil#getBukkitView()
+            // because ContainerAnvil#getBukkitView() had an ABI breakage in the middle of the Minecraft 1.21
+            // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/342
+            return ((Container) this).getBukkitView().getTopInventory();
         }
     }
 }

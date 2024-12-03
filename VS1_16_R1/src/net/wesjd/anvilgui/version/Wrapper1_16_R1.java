@@ -1,6 +1,5 @@
 package net.wesjd.anvilgui.version;
 
-
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
@@ -46,6 +45,14 @@ public class Wrapper1_16_R1 implements VersionWrapper {
     @Override
     public void sendPacketCloseWindow(Player player, int containerId) {
         toNMS(player).playerConnection.sendPacket(new PacketPlayOutCloseWindow(containerId));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendPacketExperienceChange(Player player, int experienceLevel) {
+        toNMS(player).playerConnection.sendPacket(new PacketPlayOutExperience(0f, 0, experienceLevel));
     }
 
     /**
@@ -127,7 +134,11 @@ public class Wrapper1_16_R1 implements VersionWrapper {
             // If the output is empty copy the left input into the output
             Slot output = this.getSlot(2);
             if (!output.hasItem()) {
-                output.set(this.getSlot(0).getItem().cloneItemStack());
+                Slot input = this.getSlot(0);
+
+                if (input.hasItem()) {
+                    output.set(input.getItem().cloneItemStack());
+                }
             }
 
             this.levelCost.set(0);
