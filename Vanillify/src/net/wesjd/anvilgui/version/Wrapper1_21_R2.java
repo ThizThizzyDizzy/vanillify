@@ -2,7 +2,7 @@ package net.wesjd.anvilgui.version;
 
 import org.bukkit.entity.Player;
 
-public final class Wrapper1_16_R3 implements VersionWrapper {
+public final class Wrapper1_21_R2 implements VersionWrapper {
     @Override
     public int getNextContainerId(Player player, AnvilContainerWrapper container){
         throw new UnsupportedOperationException("Not supported yet.");

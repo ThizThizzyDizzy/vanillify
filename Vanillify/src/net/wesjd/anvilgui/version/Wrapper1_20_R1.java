@@ -47,4 +47,8 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
     public Object jsonChatComponent(String json){
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    @Override
+    public void sendPacketExperienceChange(Player player, int experienceLevel){
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
