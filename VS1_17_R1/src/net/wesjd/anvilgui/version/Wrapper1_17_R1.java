@@ -10,6 +10,7 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.*;
+import net.wesjd.anvilgui.version.special.AnvilContainer1_17_1_R1;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
@@ -164,64 +165,6 @@ public class Wrapper1_17_R1 implements VersionWrapper {
             // This call has been added in 1.17.1, to fix
             // https://hub.spigotmc.org/jira/projects/SPIGOT/issues/SPIGOT-6686
             // but we can backport it here to 1.17
-            this.updateInventory();
-            this.d();
-        }
-
-        @Override
-        public void b(EntityHuman player) {}
-
-        @Override
-        protected void a(EntityHuman player, IInventory container) {}
-
-        public int getContainerId() {
-            return this.j;
-        }
-
-        @Override
-        public String getRenameText() {
-            return this.v;
-        }
-
-        @Override
-        public void setRenameText(String text) {
-            // If an item is present in the left input slot change its hover name to the literal text.
-            Slot inputLeft = getSlot(0);
-            if (inputLeft.hasItem()) {
-                inputLeft.getItem().a(new ChatComponentText(text));
-            }
-        }
-
-        @Override
-        public Inventory getBukkitInventory() {
-            return getBukkitView().getTopInventory();
-        }
-    }
-    private class AnvilContainer1_17_1_R1 extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
-        public AnvilContainer1_17_1_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
-            super(
-                    containerId,
-                    ((CraftPlayer) player).getHandle().getInventory(),
-                    ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
-            this.checkReachable = false;
-            setTitle(guiTitle);
-        }
-
-        @Override
-        public void l() {
-            // If the output is empty copy the left input into the output
-            Slot output = this.getSlot(2);
-            if (!output.hasItem()) {
-                Slot input = this.getSlot(0);
-
-                if (input.hasItem()) {
-                    output.set(input.getItem().cloneItemStack());
-                }
-            }
-
-            this.w.set(0);
-
-            // Sync to the client
             this.updateInventory();
             this.d();
         }

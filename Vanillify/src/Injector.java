@@ -54,6 +54,17 @@ public class Injector{
                         toInject.put(anv, "net/wesjd/anvilgui/version/"+anv.getName());
                     }
                 }
+                anvilgui = new File(buildFolder, "net/wesjd/anvilgui/version/special");
+                if(anvilgui.exists()){
+                    for(File anv : anvilgui.listFiles()){
+                        File targetAnvilGUI = new File(targetBuildFolder, "net/wesjd/anvilgui/version/special/"+anv.getName());
+                        targetAnvilGUI.delete();
+                        targetAnvilGUI.getParentFile().mkdirs();
+                        Files.copy(anv.toPath(), targetAnvilGUI.toPath());
+                        System.out.println("Copied "+anv.getAbsolutePath()+" to "+targetAnvilGUI.getAbsolutePath());
+                        toInject.put(anv, "net/wesjd/anvilgui/version/special/"+anv.getName());
+                    }
+                }
             }
         }
         System.out.println("Injecting "+toInject.size()+" Vanillify files into "+specifiedJarfiles.size()+" specified jarfile"+(specifiedJarfiles.size()==1?"":"s")+"...");
