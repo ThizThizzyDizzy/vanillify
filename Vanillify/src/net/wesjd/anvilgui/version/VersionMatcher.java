@@ -28,10 +28,14 @@ public class VersionMatcher {
             this.put("1.21.4", "1_21_R3");
             this.put("1.21.5", "1_21_R4");
             this.put("1.21.6", "1_21_R5");
+            this.put("1.21.7", "1_21_R5");
+            this.put("1.21.8", "1_21_R5");
+            this.put("1.21.9", "1_21_R6");
+            this.put("1.21.10", "1_21_R6");
         }
     };
     /* This needs to be updated to reflect the newest available version wrapper */
-    private static final String FALLBACK_REVISION = "1_21_R5";
+    private static final String FALLBACK_REVISION = "1_21_R6";
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
