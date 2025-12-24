@@ -3,12 +3,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_21_R6.entity.CraftMinecartCommand;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftMinecartCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.CommandMinecart;
-public class Wrapper1_21_R6 implements VersionWrapper{
+public class Wrapper1_21_R7 implements VersionWrapper{
     @Override
     public void actionbar(Player player, String text){
         runCommand(player.getWorld(), "title "+player.getName()+" actionbar {\"text\":\""+text+"\"}");
@@ -70,7 +70,7 @@ public class Wrapper1_21_R6 implements VersionWrapper{
         try{
             var listener = ((CraftMinecartCommand)cart).getHandle().e();
             Bukkit.dispatchCommand(cart, command);
-            output = listener.g().getString();
+            output = listener.c().getString();
         }finally{
             cart.remove();
             world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, val);
