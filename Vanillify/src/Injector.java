@@ -21,7 +21,7 @@ public class Injector{
         }
         System.out.println("Root: "+root.getAbsolutePath());
         ArrayList<String> specifiedJarfiles = new ArrayList<>();
-        for(var line : Files.readAllLines(cfg.toPath())){
+        for(String line : Files.readAllLines(cfg.toPath())){
             specifiedJarfiles.add(new File(root, line).getAbsolutePath());
         }
         File targetBuildFolder = new File(vanillifyInjectorRoot, "build/classes");

@@ -1,5 +1,5 @@
 package com.thizthizzydizzy.vanillify.version;
-import java.util.Objects;
+import net.minecraft.world.level.CommandBlockListenerAbstract;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
@@ -69,7 +69,7 @@ public class Wrapper1_21_R5 implements VersionWrapper{
         cart.setCustomName("Vanillify");
         String output = null;
         try{
-            var listener = ((CraftMinecartCommand)cart).getHandle().e();
+            CommandBlockListenerAbstract listener = ((CraftMinecartCommand)cart).getHandle().e();
             listener.c(null); // Clear "last output", probably not even neccesary given that this is the first command lol
             Bukkit.dispatchCommand(cart, command);
             output = listener.l().getString();
